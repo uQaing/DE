@@ -1,4 +1,4 @@
-function [v,i]=SaDE(Nt,Ni,Np,Nd,F,CR,range,fit)
+function [fitBests,nItersions]=SaDE(Nt,Ni,Np,Nd,F,CR,range,fit)
 tic;
 disp(fit);
     xmin= -range;
@@ -15,7 +15,6 @@ disp(fit);
     SuccessMemory=zeros(LP,4);
     FailureMemory=zeros(LP,4);
     CRMemory=zeros(Np,4);
-    CRm=[0.5,0.5,0.5,0.5];
     CRs=normrnd(0.5,0.1,Np,4);
     P=[1/4,1/4,1/4,1/4];
         
@@ -68,11 +67,19 @@ disp(fit);
             FailureMemory(lp,stratetyFlag)=failureNum;
             CRMemory(:,stratetyFlag)=CRs(:,stratetyFlag);
             if G<LP
-            CRs=normrnd(0.5,0.1,Np,4);
+                for kk=1:4
+                    for ii=1:Np
+                        CRs(ii,kk)=normrnd(0.5,0.1);
+                        while((CRs(ii,kk)<0)||(CRs(ii,kk)>1))
+                            CRs(ii,kk)=normrnd(0.5,0.1);
+                        end
+                    end
+                end
             else
                 tt=repmat(median(CRMemory),Np,1);
                 
                 CRs=normrnd(tt,0.1,Np,4);
+                
             end
             lp=lp+1;
            SuccessSum=sum(SuccessMemory,1);
