@@ -31,8 +31,9 @@ disp(fit);
             end
             if stratetyFlag==4
             son=  XG+ rand(Np,1).*(XG(R5s(:,1),:) - XG)+Fs.*(XG(R5s(:,2),:) - XG(R5s(:,3),:));
-            son(son<xmin)=(xmax - xmin)*rand(1) + xmin;
-            son(son>xmax)=(xmax - xmin)*rand(1) + xmin;
+             son=setWithInAre(son,[xmin,xmax]);
+%             son(son<xmin)=(xmax - xmin)*rand(1) + xmin;
+%             son(son>xmax)=(xmax - xmin)*rand(1) + xmin;
             XG_C=son;
             else
                 switch stratetyFlag
@@ -43,9 +44,9 @@ disp(fit);
                     case 3
                         son = XG(R5s(:,1),:) + Fs.*(XG(R5s(:,2),:) - XG(R5s(:,3),:))+Fs.*(XG(R5s(:,4),:) - XG(R5s(:,5),:));
                 end
-            
-            son(son<xmin)=(xmax - xmin)*rand(1) + xmin;
-            son(son>xmax)=(xmax - xmin)*rand(1) + xmin;
+             son=setWithInAre(son,[xmin,xmax]);
+%             son(son<xmin)=(xmax - xmin)*rand(1) + xmin;
+%             son(son>xmax)=(xmax - xmin)*rand(1) + xmin;
             XG_V=son;
             %% %%%%%%%%%%%%%%%%%%%%%---½»²æ²Ù×÷----%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             randR=randi([1,Nd],Np,1);
@@ -114,4 +115,9 @@ disp(fit);
     end
 
 toc
+end
+function y=setWithInAre(x,a)
+c=(x>=a(1))|(x<=a(2));
+y=x.*c+(a(1)+(a(2)-a(1))*rand(size(x))).*(1-c);
+
 end

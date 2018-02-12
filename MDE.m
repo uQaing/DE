@@ -54,10 +54,12 @@ xmax = upLow;
             Fs=normrnd(mean(Fs),Qf,Np,1);
             meanCR=mean(CRs,2);
             CRs=(meanCR-Qcr)+(2*Qcr)*rand;
-            Fs(Fs>Fmax)=Fmin+(Fmax-Fmin)*rand;
-            Fs(Fs<Fmin)=Fmin+(Fmax-Fmin)*rand;
-            CRs(CRs>CRmax)=CRmin+(CRmax-CRmin)*rand;
-            CRs(CRs<CRmin)=CRmin+(CRmax-CRmin)*rand;
+            Fs=setWithInAre(Fs,[Fmin,Fmax]);
+%             Fs(Fs>Fmax)=Fmin+(Fmax-Fmin)*rand;
+%             Fs(Fs<Fmin)=Fmin+(Fmax-Fmin)*rand;
+            CRs=setWithInAre(CRs,[Fmin,Fmax]);
+%             CRs(CRs>CRmax)=CRmin+(CRmax-CRmin)*rand;
+%             CRs(CRs<CRmin)=CRmin+(CRmax-CRmin)*rand;
             %% %%%%%%%%%%%%%%%%%%%%%%----±äÒì²Ù×÷----%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
           
             for n=1:Np
@@ -71,9 +73,9 @@ xmax = upLow;
                     end
                
                     testRe=testRe+1;
-                
-                son(son<xmin)=(xmax - xmin)*rand(1) + xmin;
-                son(son>xmax)=(xmax - xmin)*rand(1) + xmin;
+                son=setWithInAre(son,[xmin,xmax]);
+%                 son(son<xmin)=(xmax - xmin)*rand(1) + xmin;
+%                 son(son>xmax)=(xmax - xmin)*rand(1) + xmin;
                 XG_V(n,:)=son;
             end
 
@@ -116,5 +118,9 @@ xmax = upLow;
 
 end
 
+function y=setWithInAre(x,a)
+c=(x>=a(1))|(x<=a(2));
+y=x.*c+(a(1)+(a(2)-a(1))*rand(size(x))).*(1-c);
 
+end
 

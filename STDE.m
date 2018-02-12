@@ -31,8 +31,9 @@ disp(fit);
                 R3s(n,:)=randperm(Np,3);
             end
                 son = XG(R3s(:,3),:) + F*(XG(R3s(:,2),:) - XG(R3s(:,1),:));
-                son(son<xmin)=(xmax - xmin)*rand(1) + xmin;
-                son(son>xmax)=(xmax - xmin)*rand(1) + xmin;
+                son=setWithInAre(son,[xmin,xmax]);
+%                 son(son<xmin)=(xmax - xmin)*rand(1) + xmin;
+%                 son(son>xmax)=(xmax - xmin)*rand(1) + xmin;
                 XG_V=son;
             
 
@@ -77,4 +78,7 @@ disp(fit);
 
 toc
 end
-
+function y=setWithInAre(x,a)
+c=(x>=a(1))|(x<=a(2));
+y=x.*c+(a(1)+(a(2)-a(1))*rand(size(x))).*(1-c);
+end

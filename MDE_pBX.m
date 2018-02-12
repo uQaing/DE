@@ -48,7 +48,7 @@ for k=1:Nt
 
 %         baseVector=topIndex(randperm(xp,1));
         
-QXG=XG(randperm(Np,q*Np),:);
+        QXG=XG(randperm(Np,q*Np),:);
         [~,i]=min(fit(QXG));
         R3s=randperm(Np,3);
         %% %%%%%%%%%%%%%%%%%%%%%%----变异操作----%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -114,9 +114,16 @@ QXG=XG(randperm(Np,q*Np),:);
         meanPowFsuccess=MiN;
         
         Fm=wf.*Fm+(1-wf)*(meanPowFsuccess);
-        Fs=myCauchy(Fm,0.1);
-        Fs(Fs>Fmax)=Fmin+(Fmax-Fmin)*rand;
-        Fs(Fs<Fmin)=Fmin+(Fmax-Fmin)*rand;
+        F2m=repmat(Fm,2,1);
+        Fs =myCauchy(F2m,0.1);
+        Fs=Fs(Fs>=0&Fs<=1);
+        [r,~]=size(Fs);
+        while(r<Np)
+        Fs =myCauchy(F2m,0.1);
+        Fs=Fs(Fs>=0&Fs<=1);
+        [r,~]=size(Fs);
+        end
+        Fs=Fs(1:Np);
         
         
         
@@ -131,12 +138,18 @@ QXG=XG(randperm(Np,q*Np),:);
         meanPowCRsuccess=MiN;
         
         CRm=wCR.*CRm+(1-wCR)*(meanPowCRsuccess);
-        CRs=normrnd(CRm,0.1);
-        CRs(CRs>CRmax)=CRmin+(CRmax-CRmin)*rand;
-        CRs(CRs<CRmin)=CRmin+(CRmax-CRmin)*rand;
-        
-        
-        
+        CR2m=repmat(Fm,2,1);
+       
+        CRs =normrnd(CR2m,0.1,2*Np,1);
+        CRs=CRs(CRs>=0&CRs<=1);
+        [r,~]=size(CRs);
+        while(r<Np)
+           CRs =normrnd(CR2m,0.1,2*Np,1);
+        CRs=CRs(CRs>=0&CRs<=1);
+        [r,~]=size(CRs);
+        end
+        CRs=CRs(1:Np);
+          
     end
     disp(['MDE_pBX第',num2str(k),'次测试 在第',num2str(G),'次迭代找到最优值：',num2str(fitBests(k,G))]);
 end
@@ -145,3 +158,7 @@ toc
 
 end
 
+function y=setWithInAre(x,a)
+c=(x>=a(1))|(x<=a(2));
+y=x.*c+(a(1)+(a(2)-a(1))*rand(size(x))).*(1-c);
+end

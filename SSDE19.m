@@ -77,6 +77,7 @@ for t=1:Nt
                 end
             else
 %                 son=xmin+(xmax-xmin)*rand(1,Nd);
+                
                     son = XG(R3(3),:) + (0.1+0.7*rand)*(XG(R3(2),:) - XG(R3(1),:));
                     %                       CRs(n,:)=CRmin+(CRmax-CRmin)*rand(1,Nd);
                     tempCRs=normrnd(0.5,1);
@@ -84,6 +85,8 @@ for t=1:Nt
                         tempCRs=normrnd(0.5,0.1);
                     end
                     CRs(n,:)= tempCRs;
+
+
 %                       son = XG(baseVector,:) + Fs(n)*(XG(R3(2),:) - XG(R3(1),:));
 %              son=  XG(n,:)+ (0.1+0.7*rand)*(XG(R3(1),:) - XG(n,:))+Fs(n)*(XG(R3(2),:) - XG(R3(3),:));
 %              son = XG(R3(1),:) + Fs(n)*(XG(R3(2),:) - XG(R3(3),:))+Fs(n)*(XG(R3(4),:) - XG(R3(5),:));
@@ -117,8 +120,9 @@ for t=1:Nt
 %           
 %         XG_V=sonNextPTB+sonNextPFB+sonNextFP;
        
-        XG_V(XG_V<xmin)=(xmax - xmin)*rand(1) + xmin;
-        XG_V(XG_V>xmax)=(xmax - xmin)*rand(1) + xmin;
+%         XG_V(XG_V<xmin)=(xmax - xmin)*rand(1) + xmin;
+%         XG_V(XG_V>xmax)=(xmax - xmin)*rand(1) + xmin;
+          XG_V=setWithInAre(XG_V,[xmin,xmax]);
         %% %%%%%%%%%%%%%%%%%%%%%---交叉操作----%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         randR=randi([1,Nd],Np,1);
         dV=repmat(1:Nd,Np,1);
@@ -141,9 +145,9 @@ for t=1:Nt
         %保存本次迭代最小fitness
         fitBests(t,G) = valueBest;
         nItersions(t)=G;
-%         if valueBest==0
-%             break;
-%         end
+        if valueBest==0
+            break;
+        end
         
         
         %% ready next itermsion
@@ -153,10 +157,7 @@ for t=1:Nt
         
      K=0.05;
         if  usable>K
-            plan1=plan1+1;
-
-            
-            
+            plan1=plan1+1;     
             Ps_success=Ps.*tempC_i;
             Bs_success=Bs.*tempC_i;
             Fs_success=Fs.*tempC_i;
@@ -227,15 +228,12 @@ for t=1:Nt
             xd_Min=min(XGG,[],1);
             xd_Max=max(XGG,[],1); 
         
-    end
-    %         test0
-    %         test1
-    %         testBest
-    %         testRand
-    %         testRe
-    %         nn
+     end
     disp(['SSDE第',num2str(t),'次测试 在第',num2str(G),'次迭代找到最优值：',num2str(fitBests(t,G)),' plan1= ',num2str(plan1),'plan2= ',num2str(plan2)]);
-    %         disp(sm);
 end
 
+end
+function y=setWithInAre(x,a)
+c=(x>=a(1))&(x<=a(2));
+y=x.*c+(a(1)+(a(2)-a(1))*rand(size(x))).*(1-c);
 end

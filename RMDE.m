@@ -32,8 +32,9 @@ disp(fit);
                 else
                     son=xmin+(xmax-xmin)*rand(1,Nd);
                 end
-                son(son<xmin)=(xmax - xmin)*rand(1) + xmin;
-                son(son>xmax)=(xmax - xmin)*rand(1) + xmin;
+                son=setWithInAre(son,[xmin,xmax]);
+%                 son(son<xmin)=(xmax - xmin)*rand(1) + xmin;
+%                 son(son>xmax)=(xmax - xmin)*rand(1) + xmin;
                 XG_V(n,:)=son;
             end
            
@@ -63,6 +64,9 @@ disp(fit);
         end
         disp(['RMDE第',num2str(t),'次测试 在第',num2str(i),'次迭代找到最优值：',num2str(fitBests(t,i))]);
     end
+end
 
-
+function y=setWithInAre(x,a)
+c=(x>=a(1))|(x<=a(2));
+y=x.*c+(a(1)+(a(2)-a(1))*rand(size(x))).*(1-c);
 end
