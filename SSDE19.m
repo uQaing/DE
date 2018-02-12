@@ -54,18 +54,12 @@ for t=1:Nt
         [~,temp_fit_index]=sort(temp_fit,1);% 排序
         xp=ceil(0.5*Np*(1-(G-1)/Ni));
         topIndex=temp_fit_index(1:xp); 
-%         baseVector=topIndex(randperm(xp,1));
         baseVectors=topIndex(randi(xp,Np,1));
         
         QXG=XG(randperm(Np,q*Npp),:);
         [~,i]=min(fit(QXG));
         %% %%%%%%%%%%%%%%%%%%%%%%----变异操作----%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%  
         for n=1:Np
-%         baseVector=topIndex(randperm(xp,1));
-        
-%         QXG=XG(randperm(Np,q*Npp),:);
-%         [~,i]=min(fit(QXG));
-        
         R3=randperm(Np,5);
         
             if rand <Ps(n)
@@ -95,34 +89,6 @@ for t=1:Nt
             XG_V(n,:)=son;
         end
 
-
-
-%        for n=1:Np
-%        R3s(n,:)=randperm(Np,3);
-%        end
-%        sonPTB = XG(R3s(3),:) + Fs.*(QXG(i,:)-XG(R3s(3),:)+XG(R3s(:,2),:) - XG(R3s(:,1),:));
-%        sonPFB = XG(baseVector,:) + Fs.*(XG(R3s(2),:) - XG(R3s(1),:));
-%        sonFP = XG(R3s(3),:) + Fs.*(XG(R3s(2),:) - XG(R3s(1),:));
-%        
-%        randP=rand(Np,1);
-%        randB=rand(Np,1);
-%        logicP=randP<Ps;
-%        logicB=randB<Bs;
-%        
-%        logicPTB=logicP&logicB;
-%        logicPFB=logicP&(~logicB);
-%        logicFP=(~logicP);
-%        
-%        templogic=logicPTB+logicPFB+logicFP;
-%        
-%        sonNextPTB=logicPTB.*sonPTB;
-%        sonNextPFB=logicPFB.*sonPFB;
-%        sonNextFP=logicFP.*sonFP;
-%           
-%         XG_V=sonNextPTB+sonNextPFB+sonNextFP;
-       
-%         XG_V(XG_V<xmin)=(xmax - xmin)*rand(1) + xmin;
-%         XG_V(XG_V>xmax)=(xmax - xmin)*rand(1) + xmin;
           XG_V=setWithInAre(XG_V,[xmin,xmax]);
         %% %%%%%%%%%%%%%%%%%%%%%---交叉操作----%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         randR=randi([1,Nd],Np,1);
@@ -159,8 +125,6 @@ for t=1:Nt
      K=0.05;
         if  usable>K
             plan1=plan1+1;     
-            Ps_success=Ps.*tempC_i;
-            Bs_success=Bs.*tempC_i;
             Fs_success=Fs.*tempC_i;
             
             
