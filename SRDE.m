@@ -98,6 +98,6 @@ XG_V=zeros(Np,Nd);
 end
 
 function y=setWithInAre(x,a)
-c=(x>=a(1))|(x<=a(2));
+c=(x>=a(1))&(x<=a(2));
 y=x.*c+(a(1)+(a(2)-a(1))*rand(size(x))).*(1-c);
 end

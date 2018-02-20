@@ -19,32 +19,30 @@ Np=Npp-1;
 xmin= -upLow;
 xmax = upLow;
 q=0.15;
-
+fsn=1.5;
 fitBests=zeros(Nt,Ni);
 nItersions=zeros(Nt,1);
-R3s=zeros(Np,3);
+
 for t=1:Nt
-
-
-
+    Fm=0.5*ones(Np,1);
+    CRm=0.6*ones(Np,1);
     plan1=0;
-    plan2=0;
-    
+    plan2=0;    
     XG = xmin+(xmax-xmin)*rand(Np,Nd);  %产生Np个D维向量
     XG_V=zeros(Np,Nd);
-%     [~,indexBest] = min(fit(XG));
-    
     % Fs and CRs in first iterasion.
     Fs=Fmin+(Fmax-Fmin)*rand(Np,1);
     CRs=CRmin+(CRmax-CRmin)*rand(Np,Nd);%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     Ps=PBest+0.1*rand(Np,1);
     Bs=BBest+0.1*rand(Np,1);
-    
+%     Ps=normrnd(0.9,0.1,Np,1);  
+%     Bs=normrnd(0.5,0.1,Np,1); 
    xd_Min=min(XG,[],1);
    xd_Max=max(XG,[],1);
     Fs_success=Fs;
+
      for G=1:Ni
-        
+
         XG_n=xd_Min+(xd_Max-xd_Min).*rand(Np,Nd);
         tempN=fit(XG_n)<fit(XG);
         tempN=repmat(tempN,1,Nd);
@@ -54,12 +52,18 @@ for t=1:Nt
         [~,temp_fit_index]=sort(temp_fit,1);% 排序
         xp=ceil(0.5*Np*(1-(G-1)/Ni));
         topIndex=temp_fit_index(1:xp); 
+%         baseVector=topIndex(randperm(xp,1));
         baseVectors=topIndex(randi(xp,Np,1));
         
         QXG=XG(randperm(Np,q*Npp),:);
         [~,i]=min(fit(QXG));
         %% %%%%%%%%%%%%%%%%%%%%%%----变异操作----%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%  
         for n=1:Np
+%         baseVector=topIndex(randperm(xp,1));
+        
+%         QXG=XG(randperm(Np,q*Npp),:);
+%         [~,i]=min(fit(QXG));
+        
         R3=randperm(Np,5);
         
             if rand <Ps(n)
@@ -88,7 +92,6 @@ for t=1:Nt
             end           
             XG_V(n,:)=son;
         end
-
           XG_V=setWithInAre(XG_V,[xmin,xmax]);
         %% %%%%%%%%%%%%%%%%%%%%%---交叉操作----%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         randR=randi([1,Nd],Np,1);
@@ -125,6 +128,8 @@ for t=1:Nt
      K=0.05;
         if  usable>K
             plan1=plan1+1;     
+            Ps_success=Ps.*tempC_i;
+            Bs_success=Bs.*tempC_i;
             Fs_success=Fs.*tempC_i;
             
             
@@ -137,16 +142,75 @@ for t=1:Nt
             u=sum(temp);
             d=sum(temp.^2);
             Bs=tempC_i.*Bs+(1-tempC_i).*(d/u);
-            
+             
+      
+                          
+               
             temp=tempC_i.*Fs;
-            u=sum(temp);
-            d=sum(temp.^2);
-            Fs=tempC_i.*Fs+(1-tempC_i).*(d/u);
-           
+             if ~isempty(find(temp<0))
+                    k=0;
+                end
+            Fsuccess=temp;
+%             temp(temp==0)=[];
+%             tempF=[tempF;temp];
+%             u=sum(tempF);
+%             d=sum(tempF.^2);
+%             Fs=tempC_i.*Fs+(1-tempC_i).*(d/u);
+
+        wf=0.8+0.2*rand(Np,1);
+        Fsuccess(temp==0)=[];
+        M=Fsuccess.^(fsn);
+        N=length(Fsuccess);
+        sumM=sum(M);
+        MiN=(sumM/N)^(1/fsn);
+        meanPowFsuccess=MiN;
+        
+        Fm=wf.*Fm+(1-wf)*(meanPowFsuccess);
+        F2m=repmat(Fm,2,1);
+        Fs =myCauchy(F2m,0.1);
+                     if ~isempty(find(Fs<0))
+                    k=0;
+                end
+        Fs=Fs(Fs>=0&Fs<=1);
+        if ~isempty(find(Fs<0))
+                    k=0;
+                end
+        [r,~]=size(Fs);
+        while(r<Np)
+        Fs =myCauchy(F2m,0.1);
+        Fs=Fs(Fs>=0&Fs<=1);
+        [r,~]=size(Fs);
+        end
+        Fs=Fs(1:Np);
+                               ii=imag(Fs);
+                if ii~=0
+                    k=0;
+                end
             temp=tempC_i.*CRs;
-            u=sum(temp,1);%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-            d=sum(temp.^2,1);%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-            CRs=tempC_i.*CRs+(1-tempC_i).*(d./u);
+            CRsuccess=temp;
+%             u=sum(temp,1);%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%             d=sum(temp.^2,1);%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%             CRs=tempC_i.*CRs+(1-tempC_i).*(d./u);
+        wCR=0.9+0.1*rand(Np,1);
+        CRsuccess(temp==0)=[];
+        M=CRsuccess.^(fsn);
+        N=length(CRsuccess);
+        sumM=sum(M);
+        MiN=(sumM/N)^(1/fsn);
+        meanPowCRsuccess=MiN;
+        
+        CRm=wCR.*CRm+(1-wCR)*(meanPowCRsuccess);
+        CR2m=repmat(Fm,2,1);
+       
+        CRs =normrnd(CR2m,0.1,2*Np,1);
+        CRs=CRs(CRs>=0&CRs<=1);
+        [r,~]=size(CRs);
+        while(r<Np)
+           CRs =normrnd(CR2m,0.1,2*Np,1);
+        CRs=CRs(CRs>=0&CRs<=1);
+        [r,~]=size(CRs);
+        end
+        CRs=CRs(1:Np);
                        
         else
             plan2=plan2+1;
@@ -174,18 +238,29 @@ for t=1:Nt
             tempCR=(fits<=avgFits);
             CRs=CRs.*tempCR-(CRmin+(CRmax-CRmin)*t3).*(1-tempCR);
             
+            Fs=setWithInAre(Fs,[Fmin,Fmax]);
+            CRs=setWithInAre(CRs,[CRmin,CRmax]);
         end
-             Ps(Ps>PBest+0.1)=PBest+0.1*rand;
-             Ps(Ps<PBest)=PBest+0.1*rand;
+        
+%         Ps=normrnd(0.9,0.1,Np,1);  
+%     Bs=normrnd(0.5,0.1,Np,1); 
+
+
+% Ps=setWithInAre(Ps,[0.9,1]);
+% Bs=setWithInAre(Bs,[0.5,0.6]);
+
+%              Ps((Ps>PBest)|(Ps<PBest))=PBest+0.1*rand(Np,1);
              
-             Bs(Ps>BBest+0.1)=BBest+0.1*rand;
-             Bs(Ps<BBest)=BBest+0.1*rand;
              
-             Fs(Fs>Fmax)=Fmin+(Fmax-Fmin)*rand;
-             Fs(Fs<Fmin)=Fmin+(Fmax-Fmin)*rand;
+%              Bs((Bs>BBest)|(Bs<BBest))=BBest+0.1*rand(Np,1);
+             
+             
+%              Fs(Fs>Fmax)=Fmin+(Fmax-Fmin)*rand;
+%              Fs(Fs<Fmin)=Fmin+(Fmax-Fmin)*rand;
              
             %
             XGG=XG;
+
             XG_end_fromMean=mean(XG);
             if fit(XG_end_fromMean)<fit(XG(Np,:))
                 XGG(Npp,:)=XG_end_fromMean;

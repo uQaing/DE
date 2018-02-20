@@ -25,6 +25,8 @@ for k=1:Nt
     XGNext=zeros(Np,Nd); 
     XA=[];
     for g=1:Ni
+%         SF=[];
+%         SCR=[];
         %% %%%%%%%%%%%%%%%%%%%%%%----±äÒì²Ù×÷----%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%     
         temp_fit=fit(XG);
         [B,I]=sort(temp_fit);% ÉýÐò
@@ -38,8 +40,9 @@ for k=1:Nt
         [r,~]=size(CRis);
         end
         CRis=CRis(1:Np);
+
         
-        Fis=cauchycdf(ones(Np,1)*uF,0.1);
+        Fis=myCauchy(ones(Np,1)*uF,0.1);
         Fis((Fis<=0)|(Fis>=1))=1;
         for i=1:Np
 %             CRi =normrnd(uCR,0.1);

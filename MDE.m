@@ -37,9 +37,7 @@ xmax = upLow;
         XG_V=zeros(Np,Nd);
         [valueBest,indexBest] = min(fit(XG));
         
-        Fs=normrnd(Mf,Qf,Np,1);
-            
-        CRs=CRmin+(CRmax-CRmin)*rand(Np,Nd);
+
         xd_Min=min(XG,[],1);
         xd_Max=max(XG,[],1);  
        for G=1:Ni
@@ -51,19 +49,33 @@ xmax = upLow;
             XG=XG_n.*tempN-XG.*(tempN-1);
             
             r=(G/Ni)^(1/4);
-            Fs=normrnd(mean(Fs),Qf,Np,1);
-            meanCR=mean(CRs,2);
-            CRs=(meanCR-Qcr)+(2*Qcr)*rand;
-            Fs=setWithInAre(Fs,[Fmin,Fmax]);
+           
+            Fs=normrnd(Mf,Qf,2*Np,1);
+             Fs=Fs(Fs>=Fmin&Fs<=Fmax);
+        [row,~]=size(Fs);
+        while(row<Np)
+            Fs=normrnd(Mf,Qf,2*Np,1);
+        Fs=Fs(Fs>=Fmin&Fs<=Fmax);
+        [row,~]=size(Fs);
+        end
+        Fs=Fs(1:Np);
+        
+%             CRs=(Mcr-Qcr)+(2*Qcr)*rand();
+              CRs=unifrnd(Mcr-Qcr,Mcr+Qcr,Np,1);
 %             Fs(Fs>Fmax)=Fmin+(Fmax-Fmin)*rand;
 %             Fs(Fs<Fmin)=Fmin+(Fmax-Fmin)*rand;
-            CRs=setWithInAre(CRs,[Fmin,Fmax]);
+%             CRs=setWithInAre(CRs,[Fmin,Fmax]);
 %             CRs(CRs>CRmax)=CRmin+(CRmax-CRmin)*rand;
 %             CRs(CRs<CRmin)=CRmin+(CRmax-CRmin)*rand;
             %% %%%%%%%%%%%%%%%%%%%%%%----±äÒì²Ù×÷----%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
           
             for n=1:Np
                 R3=randperm(Np,3);
+%                 Fs=normrnd(Mf,Qf);
+%                 while((Fs<=Fmin)||(Fs>=Fmax))
+%                  Fs=normrnd(Mf,Qf);
+%                 end
+                
                     if rand <r
                         son=XG(indexBest,:)+ Fs(n)*(XG(R3(2),:) - XG(R3(1),:));
                         testBest=testBest+1;
@@ -119,7 +131,7 @@ xmax = upLow;
 end
 
 function y=setWithInAre(x,a)
-c=(x>=a(1))|(x<=a(2));
+c=(x>=a(1))&(x<=a(2));
 y=x.*c+(a(1)+(a(2)-a(1))*rand(size(x))).*(1-c);
 
 end

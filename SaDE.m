@@ -5,11 +5,11 @@ disp(fit);
     xmax = range;
     Fmin=-0.4;
     Fmax=1.4;
-    
-    for k=1:Nt
-     R5s=zeros(Np,5);
     fitBests=zeros(Nt,Ni);
     nItersions=zeros(Nt,1);
+    for k=1:Nt
+     R5s=zeros(Np,5);
+
     LP=50;
     lp=1;
     SuccessMemory=zeros(LP,4);
@@ -117,7 +117,7 @@ disp(fit);
 toc
 end
 function y=setWithInAre(x,a)
-c=(x>=a(1))|(x<=a(2));
+c=(x>=a(1))&(x<=a(2));
 y=x.*c+(a(1)+(a(2)-a(1))*rand(size(x))).*(1-c);
 
 end
