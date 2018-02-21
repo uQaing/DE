@@ -57,8 +57,9 @@ for k=1:Nt
             PA=[XG;XA];
             XGr2g=PA(randperm(Np,1),:);
             son = XG(i,:) +Fis(i)*(XGp_bestg-XG(i,:))+Fis(i)*(XGr1g-XGr2g);
-            son((son<xmin)|(son>xmax))=(xmax - xmin)*rand(1) + xmin;
-            XG_V=son;            
+            %             son((son<xmin)|(son>xmax))=(xmax - xmin)*rand(1) + xmin;
+            son=setWithInAre(son,[xmin,xmax]);
+            XG_V=son;
         %% %%%%%%%%%%%%%%%%%%%%%---½»²æ²Ù×÷----%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%        
         tempX=(rand(1,Nd)<=CRis(i)) | (randperm(Nd,1)==[1:Nd]);
         XG_C=XG_V.*tempX-XG(i,:).*(tempX-1);
@@ -91,6 +92,9 @@ for k=1:Nt
 end %end Nt
     toc
 end
-
+function y=setWithInAre(x,a)
+c=(x>=a(1))&(x<=a(2));
+y=x.*c+(a(1)+(a(2)-a(1))*rand(size(x))).*(1-c);
+end
 
 
